@@ -2,10 +2,9 @@
   <div class="notes" id="notes">
     <table>
       <tr v-for="note in Notes" :key="note.id">
-        <td>id : {{ note.id }}<br>
-        title : {{ note.title }}<br>
-        content : {{ note.content }}<br>
-        <router-link :to="`/more/${note.id}`">More</router-link>
+        <td>
+        Note : {{ note.title }}<br>
+        <router-link :to="`/more/${note._id}`">More</router-link>
  </td>
       </tr>
     </table>
@@ -14,14 +13,18 @@
 
 
 <script>
+import axios from 'axios';
 export default {
   name: 'Notes',
   data() {
-    return { Notes: [
-      { id: "1", title: "note1", content: "coucou c'est moi" },
-      { id: "2", title: "note2", content: "coucou encore c'est moi" },
-      { id: "3", title: "note3", content: "coucou encore encore c'est moi" }
-    ] }
+    return { Notes: [] }
+  },
+  created() {
+    axios.get(`http://postit.wac.under-wolf.eu/notes`)
+    .then(response => {
+      // JSON responses are automatically parsed.
+      this.Notes = response.data.notes
+    })
   }
 }
 </script>

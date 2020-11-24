@@ -1,11 +1,15 @@
 <template>
   <div class="oneNote" id="oneNote">
     <div class="container">
-      id : {{ getNote.id }}<br>
-      title : {{ getNote.title }}<br>
-      content : {{ getNote.content }}<br>
-      <button>Modify</button><br>
-      <button>Delete</button><br>
+      <button v-on:click="modifyNote">Modify</button> 
+      <button v-on:click="deleteNote">Delete</button><br><br>
+      <strong>Note : {{ Note.title }}</strong><br><br>
+      <u>Steps</u> : 
+      <ul>
+        <li v-for="step in Note.content" :key="step">
+          {{ step }}
+        </li>
+        </ul><br>
       <router-link to="/">Back home</router-link>
     </div>
   </div>
@@ -13,26 +17,31 @@
 
 
 <script>
+import axios from 'axios';
 export default {
   name: 'OneNote',
   data() {
-    return { Notes: [
-      { id: "1", title: "note1", content: "coucou c'est moi" },
-      { id: "2", title: "note2", content: "coucou encore c'est moi" },
-      { id: "3", title: "note3", content: "coucou encore encore c'est moi" }
-    ] }
+    return { Note: [] }
   },
   props: {
     noteId: String
   },
-  computed: {
-    getNote() {
-      for(var i=0; i < this.Notes.length; i++)
-      {
-        console.log("id " + this.Notes[i].id);
-        if(this.Notes[i].id == this.noteId) return this.Notes[i];
-      }
-      return null;
+  created() {
+    axios.get(`http://postit.wac.under-wolf.eu/notes/${this.noteId}`)
+    .then(response => {
+      // JSON responses are automatically parsed.
+      this.Note = response.data.note
+    })
+  },
+  methods: {
+    deleteNote: function() {
+      axios.delete(`http://postit.wac.under-wolf.eu/notes/${this.noteId}`)
+      .then(() => {
+        alert("Note deleted");
+        this.$router.push('/')
+      })
+    },
+    modifyNote: function() {
     }
   }
 }
@@ -44,7 +53,7 @@ h3 {
   margin: 40px 0 0;
 }
 .container {
-  width: 55%;
+  width: 70%;
   text-align: left;
   float: right;
 }
@@ -52,10 +61,6 @@ td {
   list-style-type: none;
   padding: 30px;
   text-align: left;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
 }
 a {
   color: #42b983;
